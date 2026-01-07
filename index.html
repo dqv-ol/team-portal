@@ -350,7 +350,7 @@
 
           if (match.isAccessible || match.isLive) {
             inner += `    <div class="button-container">`;
-            inner += `      <a href="${payload.folderUrl}" class="download-btn">📁 Zum Download der Kategorien</a>`;
+            inner += `      <a href="${payload.categoryFolderUrl}" class="download-btn">📁 Zum Download der Kategorien</a>`;
             inner += `    </div>`;
           } else {
             const minutesUntilAccess = Math.max(
@@ -375,21 +375,31 @@
 
             if (match.passwordHalves.HZ1) {
               inner += `  <div style="margin-bottom: 12px;">`;
-              inner += `    <strong>HZ1 – ${match.isTeamA ? 'Erste' : 'Zweite'} Passworthälfte:</strong>`;
+              inner += `    <strong>HZ1 – ${
+                match.isTeamA ? "Erste" : "Zweite"
+              } Passworthälfte:</strong>`;
               inner += `    <div class="password-half">${match.passwordHalves.HZ1}</div>`;
               inner += `  </div>`;
             }
 
             if (match.passwordHalves.HZ2) {
               inner += `  <div style="margin-bottom: 12px;">`;
-              inner += `    <strong>HZ2 – ${match.isTeamA ? 'Erste' : 'Zweite'} Passworthälfte:</strong>`;
+              inner += `    <strong>HZ2 – ${
+                match.isTeamA ? "Erste" : "Zweite"
+              } Passworthälfte:</strong>`;
               inner += `    <div class="password-half">${match.passwordHalves.HZ2}</div>`;
+              inner += `  </div>`;
+            }
+
+            // Questions folder link for captains
+            if (payload.questionsFolderUrl) {
+              inner += `  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ff9800;">`;
+              inner += `    <a href="${payload.questionsFolderUrl}" class="download-btn" style="background: #ff9800;">📋 Zum Download der Fragen</a>`;
               inner += `  </div>`;
             }
 
             inner += `</div>`;
           }
-        }
 
         matchContainer.innerHTML = inner;
       }
