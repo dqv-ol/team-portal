@@ -15,9 +15,13 @@ Das Team Portal ermöglicht Teams und Captains den Zugriff auf Kategorien-Downlo
 ### Rollenbasierter Zugriff
 
 - **Team-Mitglieder:** Zugriff auf Kategorien-Downloads im definierten Zeitfenster
-- **Captains:** Zusätzlich Zugriff auf Passworthälften während LIVE-Matches
+- **Captains:** Zusätzlich Zugriff auf unterschiedliche Passworthälften für **beide Halbzeiten** (HZ1 und HZ2)
 
-### Zeitgesteuerter Zugriff
+### Zwei Halbzeiten pro Spieltag
+
+- Jedes Match hat zwei Halbzeiten (HZ1 und HZ2) mit unterschiedlichen Uhrzeiten
+- Captains erhalten separate Passworthälften für jede Halbzeit
+- Portal zeigt beide Halbzeiten mit allen relevanten Infos
 
 - Downloads verfügbar ab X Minuten vor Spielbeginn (konfigurierbar)
 - Zugriff aktiv für Y Stunden nach Spielbeginn (konfigurierbar)
@@ -73,18 +77,22 @@ Das Team Portal ermöglicht Teams und Captains den Zugriff auf Kategorien-Downlo
 #### Tab: Konfiguration
 
 ```
-Schlüssel                | Wert
--------------------------|---------------------------
-SECRET_KEY              | beliebiger geheimer String
-FOLDER_URL              | https://drive.google.com/...
-ACCESS_MINUTES_BEFORE   | 30
-MATCH_ACTIVE_HOURS      | 4
-PASSWORT_HAELFTE_A      | erste Hälfte
-PASSWORT_HAELFTE_B      | zweite Hälfte
-SPIELTAG_DATUM          | 15.01.2026
+Schlüssel                   | Wert
+----------------------------|---------------------------
+FOLDER_URL                  | https://drive.google.com/...
+ACCESS_MINUTES_BEFORE       | 30
+MATCH_ACTIVE_HOURS          | 4
+PASSWORT_HAELFTE_A_HZ1      | Passwort Team A (Halbzeit 1)
+PASSWORT_HAELFTE_B_HZ1      | Passwort Team B (Halbzeit 1)
+PASSWORT_HAELFTE_A_HZ2      | Passwort Team A (Halbzeit 2)
+PASSWORT_HAELFTE_B_HZ2      | Passwort Team B (Halbzeit 2)
+SPIELTAG_DATUM              | 15.01.2026
 ```
 
-**Neu:** `SPIELTAG_DATUM` (Format: DD.MM.YYYY) - Erforderlich, wenn im Tab "Zeiten" nur Uhrzeiten stehen.
+**Hinweise:**
+
+- `PASSWORT_HAELFTE_*_HZ1/HZ2` - Separate Passworthälften für Halbzeit 1 und 2
+- `SPIELTAG_DATUM` (Format: DD.MM.YYYY) - Erforderlich, wenn im Tab "Zeiten" nur Uhrzeiten stehen
 
 #### Tab: Teams
 
@@ -106,7 +114,11 @@ A      | ABC      | XYZ      | Team Alpha    | Team Beta     | 19:00
 B      | GEP      | DQB      | Gemischtes... | Die Quiz...   | 20:30
 ```
 
-**Hinweis:** Bei nur Uhrzeit (z.B. `19:00`) wird automatisch `SPIELTAG_DATUM` aus der Konfiguration ergänzt.
+**Hinweis:**
+
+- Eine Zeile pro Match mit einer Startzeit
+- Das System erzeugt automatisch zwei Halbzeiten (HZ1 und HZ2) für jedes Match
+- Bei nur Uhrzeit (z.B. `19:00`) wird automatisch `SPIELTAG_DATUM` aus der Konfiguration ergänzt
 
 ### 2. Google Apps Script erstellen
 
@@ -317,20 +329,38 @@ handlePortalData({
   },
   isCaptain: true,
   folderUrl: "https://drive.google.com/...",
-  match: {
-    gruppe: "A",
-    teamA: "Team Alpha",
-    teamB: "Team Beta",
-    kuerzelA: "ABC",
-    kuerzelB: "XYZ",
-    startzeitISO: "2026-01-15T19:00:00.000Z",
-    accessTimeISO: "2026-01-15T18:30:00.000Z",
-    endDateISO: "2026-01-15T23:00:00.000Z",
-    isAccessible: true,
-    isLive: false,
-    isTeamA: true,
-  },
-  passworthalf: "erste Hälfte", // Nur für Captain während LIVE
+  matches: [
+    {
+      halbzeit: "HZ1",
+      gruppe: "A",
+      teamA: "Team Alpha",
+      teamB: "Team Beta",
+      kuerzelA: "ABC",
+      kuerzelB: "XYZ",
+      startzeitISO: "2026-01-15T19:00:00.000Z",
+      accessTimeISO: "2026-01-15T18:30:00.000Z",
+      endDateISO: "2026-01-15T23:00:00.000Z",
+      isAccessible: true,
+      isLive: false,
+      isTeamA: true,
+      passworthalf: "Passwort HZ1", // Nur für Captain während LIVE
+    },
+    {
+      halbzeit: "HZ2",
+      gruppe: "A",
+      teamA: "Team Alpha",
+      teamB: "Team Beta",
+      kuerzelA: "ABC",
+      kuerzelB: "XYZ",
+      startzeitISO: "2026-01-15T20:30:00.000Z",
+      accessTimeISO: "2026-01-15T20:00:00.000Z",
+      endDateISO: "2026-01-16T00:30:00.000Z",
+      isAccessible: false,
+      isLive: false,
+      isTeamA: true,
+      passworthalf: "Passwort HZ2", // Nur für Captain während LIVE
+    },
+  ],
 });
 ```
 
@@ -360,7 +390,7 @@ handleDebugResponse({
       "captainIdPreview": "C987..."
     }
   ],
-  "configKeys": ["SECRET_KEY", "FOLDER_URL", ...]
+  "configKeys": ["FOLDER_URL", "ACCESS_MINUTES_BEFORE", ...]
 })
 ```
 
@@ -398,3 +428,4 @@ Projekt für DQV Online-Liga.
 
 **Version:** 1.1.0  
 **Letzte Aktualisierung:** Januar 2026
+
