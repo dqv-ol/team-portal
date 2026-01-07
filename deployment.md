@@ -63,8 +63,8 @@
 Vor dem GitHub Pages Deployment kannst du lokal testen:
 
 ```powershell
-# Im Scrapy-Ordner:
-cd d:\Git\OneIm91\dqvquiznations\Scrapy
+# Im Ordner:
+cd <Pfad des lokalen Github Ordners>
 
 # Einfachen HTTP-Server starten (Python):
 python -m http.server 8000
