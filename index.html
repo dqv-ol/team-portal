@@ -204,7 +204,7 @@
         <input
           type="password"
           id="loginId"
-          placeholder="Team-ID"
+          placeholder="Team-ID / Captain-ID"
           minlength="8"
         />
         <button id="btnLogin">Anmelden</button>
@@ -227,7 +227,8 @@
     <script>
       // 1) CONFIG: Paste your GAS Web App URL below
       // Example: https://script.google.com/macros/s/AKfycb.../exec
-      const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzYgGR8Bb7T6rCIbWmcYTt8VZkOH71orzuSXIRkmuf1CtOeuBBLqhPqG347owNt6mvD/exec";
+      const GAS_WEB_APP_URL =
+        "https://script.google.com/macros/s/AKfycbzYgGR8Bb7T6rCIbWmcYTt8VZkOH71orzuSXIRkmuf1CtOeuBBLqhPqG347owNt6mvD/exec";
 
       // 2) Optional: DQV logo as Base64 (from your GAS const)
       const LOGO_BASE64 =
@@ -313,7 +314,8 @@
         const badge = payload.isCaptain
           ? '<span class="captain-badge">👤 CAPTAIN</span>'
           : "";
-        teamNameEl.innerHTML = `${payload.team.name}${badge}`;
+        const teamDisplay = payload.team.name || payload.team.kuerzel || "Team";
+        teamNameEl.innerHTML = `${teamDisplay}${badge}`;
 
         // Build match section
         if (!payload.match) {
@@ -339,8 +341,7 @@
         inner += `    <div class="match-title">Gruppe ${payload.match.gruppe} ${liveBadge}</div>`;
         inner += `    <div class="match-details">`;
         inner += `      <strong>${payload.match.teamA} vs. ${payload.match.teamB}</strong><br>`;
-        inner += `      Beginn: ${formatDateTime(start)}<br>`;
-        inner += `      Bis: ${formatDateTime(end)}`;
+        inner += `      ${formatDateTime(start)}`;
         inner += `    </div>`;
 
         if (payload.match.isAccessible || payload.match.isLive) {
@@ -373,13 +374,15 @@
       }
 
       function formatDateTime(date) {
-        return date.toLocaleString("de-DE", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        });
+        return (
+          date.toLocaleString("de-DE", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }) + " Uhr"
+        );
       }
     </script>
   </body>
