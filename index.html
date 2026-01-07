@@ -78,6 +78,32 @@
         text-align: center;
         min-height: 16px;
       }
+      .loading {
+        display: none;
+        text-align: center;
+        color: #667eea;
+        font-size: 14px;
+        margin-top: 8px;
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
 
       .team-header {
         display: flex;
@@ -122,7 +148,7 @@
       }
       .download-btn {
         display: inline-block;
-        background: #28a745;
+        background: #c80000;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
@@ -130,7 +156,7 @@
         font-weight: bold;
       }
       .download-btn:hover {
-        background: #218838;
+        background: #a00000;
       }
       .live-badge {
         background: #dc3545;
@@ -198,6 +224,7 @@
       <div class="header">
         <img class="logo" id="logo" alt="DQV Online-Liga" />
       </div>
+
       <div id="view-login" class="login">
         <h1>Team Portal</h1>
         <input
@@ -207,6 +234,10 @@
           minlength="8"
         />
         <button id="btnLogin">Anmelden</button>
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          Daten werden geladen...
+        </div>
         <div class="error" id="error"></div>
       </div>
 
@@ -242,6 +273,7 @@
       const teamNameEl = document.getElementById("teamName");
       const matchContainer = document.getElementById("matchContainer");
       const errorEl = document.getElementById("error");
+      const loadingEl = document.getElementById("loading");
 
       document
         .getElementById("btnLogin")
@@ -254,12 +286,22 @@
         });
 
       function showError(message) {
+        loadingEl.style.display = "none";
         errorEl.textContent = message;
         errorEl.style.display = "block";
       }
       function clearError() {
         errorEl.textContent = "";
         errorEl.style.display = "none";
+      }
+      function showLoading() {
+        clearError();
+        loadingEl.style.display = "block";
+        document.getElementById("btnLogin").disabled = true;
+      }
+      function hideLoading() {
+        loadingEl.style.display = "none";
+        document.getElementById("btnLogin").disabled = false;
       }
 
       function doLogout() {
@@ -279,6 +321,7 @@
           showError("ID muss mindestens 8 Zeichen lang sein");
           return;
         }
+        showLoading();
         fetchPortalDataJSONP(loginId);
       }
 
@@ -291,6 +334,7 @@
         const script = document.createElement("script");
         script.src = src;
         script.onerror = function () {
+          hideLoading();
           showError("Fehler beim Laden der Daten.");
         };
         document.body.appendChild(script);
@@ -298,6 +342,7 @@
 
       // Callback executed by GAS JSONP response
       function handlePortalData(payload) {
+        hideLoading();
         if (!payload || !payload.success) {
           showError(
             payload && payload.message ? payload.message : "Team nicht gefunden"
