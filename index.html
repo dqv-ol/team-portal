@@ -318,56 +318,77 @@
         teamNameEl.innerHTML = `${teamDisplay}${badge}`;
 
         // Build match section
-        if (!payload.match) {
+        if (!payload.matches || payload.matches.length === 0) {
           matchContainer.innerHTML = `<div class="match-info"><p>Aktuell keine anstehenden Spiele.</p></div>`;
           return;
         }
 
-        // Dates
-        const start = new Date(payload.match.startzeitISO);
-        const access = new Date(payload.match.accessTimeISO);
-        const end = new Date(payload.match.endDateISO);
-
-        const liveBadge = payload.match.isLive
-          ? '<span class="live-badge">🔴 LIVE</span>'
-          : "";
-
+        // Prozessiere alle Matches
         let inner = "";
-        inner += `<div class="match-info">`;
-        inner += `  <div style="flex:0 0 160px; display:flex; align-items:flex-start; justify-content:center;">`;
-        inner += `    <img class="logo" src="${LOGO_BASE64}" alt="DQV Online-Liga" />`;
-        inner += `  </div>`;
-        inner += `  <div style="flex:1;">`;
-        inner += `    <div class="match-title">Gruppe ${payload.match.gruppe} ${liveBadge}</div>`;
-        inner += `    <div class="match-details">`;
-        inner += `      <strong>${payload.match.teamA} vs. ${payload.match.teamB}</strong><br>`;
-        inner += `      ${formatDateTime(start)}`;
-        inner += `    </div>`;
+        for (let matchIdx = 0; matchIdx < payload.matches.length; matchIdx++) {
+          const match = payload.matches[matchIdx];
 
-        if (payload.match.isAccessible || payload.match.isLive) {
-          inner += `    <div class="button-container">`;
-          inner += `      <a href="${payload.folderUrl}" class="download-btn">📁 Zum Download der Kategorien</a>`;
+          // Dates
+          const start = new Date(match.startzeitISO);
+          const access = new Date(match.accessTimeISO);
+          const end = new Date(match.endDateISO);
+
+          const liveBadge = match.isLive
+            ? '<span class="live-badge">🔴 LIVE</span>'
+            : "";
+
+          inner += `<div class="match-info">`;
+          inner += `  <div style="flex:0 0 160px; display:flex; align-items:flex-start; justify-content:center;">`;
+          inner += `    <img class="logo" src="${LOGO_BASE64}" alt="DQV Online-Liga" />`;
+          inner += `  </div>`;
+          inner += `  <div style="flex:1;">`;
+          inner += `    <div class="match-title">Gruppe ${match.gruppe} ${liveBadge}</div>`;
+          inner += `    <div class="match-details">`;
+          inner += `      <strong>${match.teamA} vs. ${match.teamB}</strong><br>`;
+          inner += `      ${formatDateTime(start)}`;
           inner += `    </div>`;
-        } else {
-          const minutesUntilAccess = Math.max(
-            0,
-            Math.ceil((access.getTime() - Date.now()) / 60000)
-          );
-          inner += `    <div class="countdown">⏳ Download der Kategorien verfügbar in ${minutesUntilAccess} Minuten (${formatDateTime(
-            access
-          )})</div>`;
-        }
 
-        inner += `  </div>`;
-        inner += `</div>`;
+          if (match.isAccessible || match.isLive) {
+            inner += `    <div class="button-container">`;
+            inner += `      <a href="${payload.folderUrl}" class="download-btn">📁 Zum Download der Kategorien</a>`;
+            inner += `    </div>`;
+          } else {
+            const minutesUntilAccess = Math.max(
+              0,
+              Math.ceil((access.getTime() - Date.now()) / 60000)
+            );
+            inner += `    <div class="countdown">⏳ Download der Kategorien verfügbar in ${minutesUntilAccess} Minuten (${formatDateTime(
+              access
+            )})</div>`;
+          }
 
-        if (payload.passworthalf) {
-          const welche = payload.match.isTeamA ? "Erste" : "Zweite";
-          inner += `<div class="captain-section">`;
-          inner += `  <div class="captain-section-title">🔐 Captain-Information</div>`;
-          inner += `  <div>${welche} Passworthälfte:</div>`;
-          inner += `  <div class="password-half">${payload.passworthalf}</div>`;
+          inner += `  </div>`;
           inner += `</div>`;
+
+          // Show password halves if available
+          if (
+            match.passwordHalves &&
+            Object.keys(match.passwordHalves).length > 0
+          ) {
+            inner += `<div class="captain-section">`;
+            inner += `  <div class="captain-section-title">🔐 Captain-Informationen</div>`;
+
+            if (match.passwordHalves.HZ1) {
+              inner += `  <div style="margin-bottom: 12px;">`;
+              inner += `    <strong>HZ1 – Erste Passworthälfte:</strong>`;
+              inner += `    <div class="password-half">${match.passwordHalves.HZ1}</div>`;
+              inner += `  </div>`;
+            }
+
+            if (match.passwordHalves.HZ2) {
+              inner += `  <div style="margin-bottom: 12px;">`;
+              inner += `    <strong>HZ2 – Zweite Passworthälfte:</strong>`;
+              inner += `    <div class="password-half">${match.passwordHalves.HZ2}</div>`;
+              inner += `  </div>`;
+            }
+
+            inner += `</div>`;
+          }
         }
 
         matchContainer.innerHTML = inner;
