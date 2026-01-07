@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DQV JSONP Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: #333;
+        margin-top: 0;
+      }
+      h2 {
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 8px;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      button {
+        background: #667eea;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      button:hover {
+        background: #764ba2;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      pre {
+        background: #f8f8f8;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 12px;
+      }
+      .success {
+        color: #28a745;
+        font-weight: bold;
+      }
+      .error {
+        color: #dc3545;
+        font-weight: bold;
+      }
+      .info {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .label {
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>🧪 DQV Team Portal – JSONP API Test</h1>
+      <p class="info">
+        Dieses Tool testet die Verbindung zwischen deiner statischen Seite und
+        dem Google Apps Script Backend.
+      </p>
+    </div>
+
+    <div class="box">
+      <h2>1. GAS Web App URL eintragen</h2>
+      <p class="info">
+        Kopiere die URL deines Google Apps Script Web App Deployments hierher:
+      </p>
+      <label class="label" for="gasUrl">Web App URL:</label>
+      <input
+        type="text"
+        id="gasUrl"
+        placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+        value=""
+      />
+      <p class="info" style="font-size: 12px; color: #999">
+        💡 Tipp: Die URL findest du nach dem Deployment unter "Bereitstellen" →
+        "Bereitstellungen verwalten"
+      </p>
+    </div>
+
+    <div class="box">
+      <h2>2. Team/Captain ID testen</h2>
+      <p class="info">
+        Gib eine gültige Team-ID oder Captain-ID ein (mindestens 8 Zeichen):
+      </p>
+      <label class="label" for="loginId">Login ID:</label>
+      <input
+        type="password"
+        id="loginId"
+        placeholder="Team-ID oder Captain-ID (min. 8 Zeichen)"
+        value=""
+      />
+      <button id="btnTest">🚀 API Test starten</button>
+      <button id="btnClear" style="background: #6c757d; margin-left: 10px">
+        🗑️ Löschen
+      </button>
+      <button id="btnDebug" style="background: #ff9800; margin-left: 10px">
+        🔍 Teams anzeigen (Debug)
+      </button>
+    </div>
+
+    <div class="box" id="resultBox" style="display: none">
+      <h2>3. Ergebnis</h2>
+      <div id="status"></div>
+      <div id="response"></div>
+    </div>
+
+    <div class="box">
+      <h2>ℹ️ Erwartete Antwort</h2>
+      <p class="info">
+        Bei erfolgreicher Verbindung solltest du ein JSON-Objekt sehen:
+      </p>
+      <pre>
+{
+  "success": true,
+  "team": {
+    "name": "Teamname",
+    "kuerzel": "ABC"
+  },
+  "isCaptain": true/false,
+  "folderUrl": "https://...",
+  "match": {
+    "gruppe": "9",
+    "teamA": "...",
+    "teamB": "...",
+    "startzeitISO": "2026-01-15T19:00:00.000Z",
+    "isAccessible": true/false,
+    "isLive": true/false,
+    "isTeamA": true/false
+  },
+  "passworthalf": "..." // nur wenn Captain + LIVE
+}</pre
+      >
+    </div>
+
+    <script>
+      const gasUrlInput = document.getElementById("gasUrl");
+      const loginIdInput = document.getElementById("loginId");
+      const btnTest = document.getElementById("btnTest");
+      const btnClear = document.getElementById("btnClear");
+      const btnDebug = document.getElementById("btnDebug");
+      const resultBox = document.getElementById("resultBox");
+      const statusEl = document.getElementById("status");
+      const responseEl = document.getElementById("response");
+
+      // Load from localStorage
+      if (localStorage.getItem("gasUrl")) {
+        gasUrlInput.value = localStorage.getItem("gasUrl");
+      }
+      if (localStorage.getItem("loginId")) {
+        loginIdInput.value = localStorage.getItem("loginId");
+      }
+
+      // Save on change
+      gasUrlInput.addEventListener("change", () => {
+        localStorage.setItem("gasUrl", gasUrlInput.value.trim());
+      });
+      loginIdInput.addEventListener("change", () => {
+        localStorage.setItem("loginId", loginIdInput.value.trim());
+      });
+
+      btnTest.addEventListener("click", runTest);
+      btnClear.addEventListener("click", clearResults);
+      btnDebug.addEventListener("click", runDebug);
+
+      loginIdInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") runTest();
+      });
+
+      function clearResults() {
+        resultBox.style.display = "none";
+        statusEl.innerHTML = "";
+        responseEl.innerHTML = "";
+      }
+
+      function runDebug() {
+        const gasUrl = gasUrlInput.value.trim();
+        clearResults();
+
+        if (!gasUrl) {
+          showError("Bitte GAS Web App URL eintragen!");
+          return;
+        }
+
+        resultBox.style.display = "block";
+        statusEl.innerHTML =
+          '<p class="info">⏳ Lade Team-Liste vom Backend...</p>';
+        btnDebug.disabled = true;
+
+        fetchDebugJSONP(gasUrl);
+      }
+
+      function fetchDebugJSONP(baseUrl) {
+        const callbackName = "handleDebugResponse";
+        const url = `${baseUrl}?action=debugTeams&format=jsonp&callback=${callbackName}&_=${Date.now()}`;
+
+        window[callbackName] = function (data) {
+          btnDebug.disabled = false;
+          delete window[callbackName];
+          handleDebugResponse(data);
+        };
+
+        const script = document.createElement("script");
+        script.src = url;
+        script.onerror = function () {
+          btnDebug.disabled = false;
+          delete window[callbackName];
+          showError("Fehler beim Laden! Prüfe die GAS URL.");
+        };
+        document.body.appendChild(script);
+      }
+
+      function handleDebugResponse(data) {
+        if (!data || !data.success) {
+          showError(data && data.error ? data.error : "Debug fehlgeschlagen");
+          responseEl.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+          return;
+        }
+
+        statusEl.innerHTML =
+          '<p class="success">✅ Teams erfolgreich geladen!</p>';
+
+        let html = `<label class="label">Gefundene Teams (${data.teamsCount}):</label>`;
+        html += `<div style="margin-top:10px; max-height:400px; overflow-y:auto;">`;
+
+        if (data.teams && data.teams.length > 0) {
+          html += `<table style="width:100%; border-collapse:collapse; font-size:12px;">`;
+          html += `<tr style="background:#f0f0f0; font-weight:bold;">`;
+          html += `<th style="padding:8px; border:1px solid #ddd; text-align:left;">Name</th>`;
+          html += `<th style="padding:8px; border:1px solid #ddd; text-align:left;">Kürzel</th>`;
+          html += `<th style="padding:8px; border:1px solid #ddd; text-align:center;">Team-ID</th>`;
+          html += `<th style="padding:8px; border:1px solid #ddd; text-align:center;">Captain-ID</th>`;
+          html += `</tr>`;
+
+          data.teams.forEach((t) => {
+            html += `<tr>`;
+            html += `<td style="padding:8px; border:1px solid #ddd;">${t.name}</td>`;
+            html += `<td style="padding:8px; border:1px solid #ddd;">${t.kuerzel}</td>`;
+            html += `<td style="padding:8px; border:1px solid #ddd; text-align:center; font-family:monospace;">`;
+            html += `${t.teamIdPreview} (${t.teamIdLength} Zeichen)</td>`;
+            html += `<td style="padding:8px; border:1px solid #ddd; text-align:center; font-family:monospace;">`;
+            html += `${t.captainIdPreview} (${t.captainIdLength} Zeichen)</td>`;
+            html += `</tr>`;
+          });
+
+          html += `</table>`;
+        } else {
+          html += `<p class="error">⚠️ Keine Teams gefunden!</p>`;
+        }
+
+        html += `</div>`;
+        html += `<div style="margin-top:15px; padding:10px; background:#fff3cd; border-radius:4px; font-size:12px;">`;
+        html += `<strong>💡 Hinweis:</strong> Verwende eine der oben angezeigten IDs (Team-ID oder Captain-ID) zum Einloggen.<br>`;
+        html += `<strong>Matches geladen:</strong> ${data.matchesCount}<br>`;
+        html += `<strong>Config-Keys:</strong> ${data.configKeys.join(", ")}`;
+        html += `</div>`;
+
+        responseEl.innerHTML = html;
+      }
+
+      function runTest() {
+        const gasUrl = gasUrlInput.value.trim();
+        const loginId = loginIdInput.value.trim();
+
+        clearResults();
+
+        if (!gasUrl) {
+          showError("Bitte GAS Web App URL eintragen!");
+          return;
+        }
+        if (!loginId || loginId.length < 8) {
+          showError("Login ID muss mindestens 8 Zeichen lang sein!");
+          return;
+        }
+
+        resultBox.style.display = "block";
+        statusEl.innerHTML = '<p class="info">⏳ Lade Daten vom Backend...</p>';
+        btnTest.disabled = true;
+
+        fetchJSONP(gasUrl, loginId);
+      }
+
+      function fetchJSONP(baseUrl, loginId) {
+        const callbackName = "handleTestResponse";
+        const url = `${baseUrl}?action=teamPortalData&loginId=${encodeURIComponent(
+          loginId
+        )}&format=jsonp&callback=${callbackName}&_=${Date.now()}`;
+
+        // Callback definieren
+        window[callbackName] = function (data) {
+          btnTest.disabled = false;
+          delete window[callbackName]; // cleanup
+          handleResponse(data);
+        };
+
+        const script = document.createElement("script");
+        script.src = url;
+        script.onerror = function () {
+          btnTest.disabled = false;
+          delete window[callbackName];
+          showError(
+            "Fehler beim Laden! Prüfe die GAS URL und Netzwerkverbindung."
+          );
+        };
+        document.body.appendChild(script);
+      }
+
+      function handleResponse(data) {
+        if (!data) {
+          showError("Keine Antwort vom Server erhalten.");
+          return;
+        }
+
+        if (data.success) {
+          statusEl.innerHTML =
+            '<p class="success">✅ Verbindung erfolgreich!</p>';
+          responseEl.innerHTML = `<label class="label">API Response:</label><pre>${JSON.stringify(
+            data,
+            null,
+            2
+          )}</pre>`;
+
+          // Zusätzliche Infos
+          let info = `<div style="margin-top:15px; padding:10px; background:#e7f3ff; border-radius:4px;">`;
+          info += `<strong>Team:</strong> ${data.team.name} (${data.team.kuerzel})<br>`;
+          info += `<strong>Rolle:</strong> ${
+            data.isCaptain ? "👤 Captain" : "Team-Mitglied"
+          }<br>`;
+
+          if (data.match) {
+            info += `<strong>Nächstes Match:</strong> ${data.match.teamA} vs. ${data.match.teamB}<br>`;
+            info += `<strong>Status:</strong> ${
+              data.match.isLive
+                ? "🔴 LIVE"
+                : data.match.isAccessible
+                ? "✅ Zugriff verfügbar"
+                : "⏳ Noch nicht verfügbar"
+            }<br>`;
+            if (data.passworthalf) {
+              info += `<strong>Passworthälfte:</strong> <code>${data.passworthalf}</code><br>`;
+            }
+          } else {
+            info += `<strong>Match:</strong> Keine anstehenden Spiele<br>`;
+          }
+          info += `</div>`;
+          responseEl.innerHTML += info;
+        } else {
+          showError(data.message || "Unbekannter Fehler");
+          responseEl.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+
+          // Show debug hint if available
+          if (data.debug) {
+            responseEl.innerHTML += `<div style="margin-top:15px; padding:10px; background:#fff3cd; border-radius:4px;">`;
+            responseEl.innerHTML += `<strong>Debug-Info:</strong><br>`;
+            responseEl.innerHTML += `Login-ID Länge: ${data.debug.loginIdLength} Zeichen<br>`;
+            responseEl.innerHTML += `Teams geladen: ${data.debug.teamsLoaded}<br>`;
+            responseEl.innerHTML += `<em>${data.debug.hint}</em>`;
+            responseEl.innerHTML += `</div>`;
+          }
+        }
+      }
+
+      function showError(msg) {
+        resultBox.style.display = "block";
+        statusEl.innerHTML = `<p class="error">❌ ${msg}</p>`;
+      }
+    </script>
+  </body>
+</html>
