@@ -16,12 +16,13 @@ Das Team Portal ermöglicht Teams und Captains den Zugriff auf Kategorien-Downlo
 
 - **Team-Mitglieder:** Zugriff auf Kategorien-Downloads im definierten Zeitfenster
 - **Captains:** Zusätzlich Zugriff auf unterschiedliche Passworthälften für **beide Halbzeiten** (HZ1 und HZ2)
+- **Captains:** Zusätzlich Link zum Download der Fragen (QUESTIONS_FOLDER_URL)
 
 ### Zwei Halbzeiten pro Spieltag
 
-- Jedes Match hat zwei Halbzeiten (HZ1 und HZ2) mit unterschiedlichen Uhrzeiten
+- Jedes Match hat zwei Halbzeiten (HZ1 und HZ2)
 - Captains erhalten separate Passworthälften für jede Halbzeit
-- Portal zeigt beide Halbzeiten mit allen relevanten Infos
+- Captains haben Zugriff auf separate Ordner für Kategorien und Fragen
 
 - Downloads verfügbar ab X Minuten vor Spielbeginn (konfigurierbar)
 - Zugriff aktiv für Y Stunden nach Spielbeginn (konfigurierbar)
@@ -79,7 +80,8 @@ Das Team Portal ermöglicht Teams und Captains den Zugriff auf Kategorien-Downlo
 ```
 Schlüssel                   | Wert
 ----------------------------|---------------------------
-FOLDER_URL                  | https://drive.google.com/...
+CATEGORY_FOLDER_URL         | https://drive.google.com/...
+QUESTIONS_FOLDER_URL        | https://drive.google.com/...
 ACCESS_MINUTES_BEFORE       | 30
 MATCH_ACTIVE_HOURS          | 4
 PASSWORT_HAELFTE_A_HZ1      | Passwort Team A (Halbzeit 1)
@@ -91,6 +93,8 @@ SPIELTAG_DATUM              | 15.01.2026
 
 **Hinweise:**
 
+- `CATEGORY_FOLDER_URL` - Link zum Google Drive Ordner mit den Kategorien (für alle Teams)
+- `QUESTIONS_FOLDER_URL` - Link zum Google Drive Ordner mit den Fragen (nur für Captains)
 - `PASSWORT_HAELFTE_*_HZ1/HZ2` - Separate Passworthälften für Halbzeit 1 und 2
 - `SPIELTAG_DATUM` (Format: DD.MM.YYYY) - Erforderlich, wenn im Tab "Zeiten" nur Uhrzeiten stehen
 
@@ -114,10 +118,11 @@ A      | ABC      | XYZ      | Team Alpha    | Team Beta     | 19:00
 B      | GEP      | DQB      | Gemischtes... | Die Quiz...   | 20:30
 ```
 
-**Hinweis:**
+**Hinweis zu zwei Halbzeiten:**
 
 - Eine Zeile pro Match mit einer Startzeit
-- Das System erzeugt automatisch zwei Halbzeiten (HZ1 und HZ2) für jedes Match
+- Das System erzeugt automatisch zwei Halbzeiten (HZ1 und HZ2) intern
+- Beide Halbzeiten haben die gleiche Startzeit, aber unterschiedliche Passwörter
 - Bei nur Uhrzeit (z.B. `19:00`) wird automatisch `SPIELTAG_DATUM` aus der Konfiguration ergänzt
 
 ### 2. Google Apps Script erstellen
@@ -257,6 +262,28 @@ Im Sheet steht nur Uhrzeit (z.B. "19:00"), aber `SPIELTAG_DATUM` fehlt in der Ko
 2. Neue Zeile: `SPIELTAG_DATUM | 15.01.2026`
 3. Cache leeren: `?clearcache=true`
 
+### Problem: Fragen-Button wird nicht angezeigt
+
+**Ursache:**
+Captains sehen nur den Fragen-Button, wenn `QUESTIONS_FOLDER_URL` in der Konfiguration gesetzt ist.
+
+**Lösung:**
+
+1. Google Sheet → Tab "Konfiguration"
+2. Neue Zeile: `QUESTIONS_FOLDER_URL | https://drive.google.com/...`
+3. Cache leeren: `?clearcache=true`
+
+### Problem: Alte FOLDER_URL wird nicht erkannt
+
+**Ursache:**
+Das System wurde auf `CATEGORY_FOLDER_URL` aktualisiert. Die alte `FOLDER_URL` wird noch als Fallback akzeptiert.
+
+**Lösung (empfohlen):**
+
+1. Alte Zeile entfernen: `FOLDER_URL`
+2. Neue Zeile hinzufügen: `CATEGORY_FOLDER_URL | https://drive.google.com/...`
+3. Cache leeren: `?clearcache=true`
+
 ### Problem: Team-Name wird nicht angezeigt
 
 **Ursache:**
@@ -328,10 +355,10 @@ handlePortalData({
     kuerzel: "ABC",
   },
   isCaptain: true,
-  folderUrl: "https://drive.google.com/...",
+  categoryFolderUrl: "https://drive.google.com/...",
+  questionsFolderUrl: "https://drive.google.com/...",
   matches: [
     {
-      halbzeit: "HZ1",
       gruppe: "A",
       teamA: "Team Alpha",
       teamB: "Team Beta",
@@ -343,22 +370,10 @@ handlePortalData({
       isAccessible: true,
       isLive: false,
       isTeamA: true,
-      passworthalf: "Passwort HZ1", // Nur für Captain während LIVE
-    },
-    {
-      halbzeit: "HZ2",
-      gruppe: "A",
-      teamA: "Team Alpha",
-      teamB: "Team Beta",
-      kuerzelA: "ABC",
-      kuerzelB: "XYZ",
-      startzeitISO: "2026-01-15T20:30:00.000Z",
-      accessTimeISO: "2026-01-15T20:00:00.000Z",
-      endDateISO: "2026-01-16T00:30:00.000Z",
-      isAccessible: false,
-      isLive: false,
-      isTeamA: true,
-      passworthalf: "Passwort HZ2", // Nur für Captain während LIVE
+      passwordHalves: {
+        HZ1: "Passwort HZ1 für Team A",
+        HZ2: "Passwort HZ2 für Team A",
+      },
     },
   ],
 });
