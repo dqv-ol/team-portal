@@ -359,17 +359,20 @@
             data.isCaptain ? "👤 Captain" : "Team-Mitglied"
           }<br>`;
 
-          if (data.match) {
-            info += `<strong>Nächstes Match:</strong> ${data.match.teamA} vs. ${data.match.teamB}<br>`;
+          if (data.matches && data.matches.length > 0) {
+            info += `<strong>Anstehende Spiele:</strong> ${data.matches.length}<br>`;
+            info += `<strong>Erstes Match:</strong> ${data.matches[0].teamA} vs. ${data.matches[0].teamB} (Gruppe ${data.matches[0].gruppe})<br>`;
             info += `<strong>Status:</strong> ${
-              data.match.isLive
+              data.matches[0].isLive
                 ? "🔴 LIVE"
-                : data.match.isAccessible
+                : data.matches[0].isAccessible
                 ? "✅ Zugriff verfügbar"
                 : "⏳ Noch nicht verfügbar"
             }<br>`;
-            if (data.passworthalf) {
-              info += `<strong>Passworthälfte:</strong> <code>${data.passworthalf}</code><br>`;
+            if (data.matches[0].passwordHalves) {
+              info += `<strong>Passworthälften:</strong> HZ1=${
+                data.matches[0].passwordHalves.HZ1 || "-"
+              }, HZ2=${data.matches[0].passwordHalves.HZ2 || "-"}<br>`;
             }
           } else {
             info += `<strong>Match:</strong> Keine anstehenden Spiele<br>`;
