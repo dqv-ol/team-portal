@@ -375,14 +375,14 @@
 
             if (match.passwordHalves.HZ1) {
               inner += `  <div style="margin-bottom: 12px;">`;
-              inner += `    <strong>HZ1 – Erste Passworthälfte:</strong>`;
+              inner += `    <strong>HZ1 – ${match.isTeamA ? 'Erste' : 'Zweite'} Passworthälfte:</strong>`;
               inner += `    <div class="password-half">${match.passwordHalves.HZ1}</div>`;
               inner += `  </div>`;
             }
 
             if (match.passwordHalves.HZ2) {
               inner += `  <div style="margin-bottom: 12px;">`;
-              inner += `    <strong>HZ2 – Zweite Passworthälfte:</strong>`;
+              inner += `    <strong>HZ2 – ${match.isTeamA ? 'Erste' : 'Zweite'} Passworthälfte:</strong>`;
               inner += `    <div class="password-half">${match.passwordHalves.HZ2}</div>`;
               inner += `  </div>`;
             }
