@@ -441,7 +441,7 @@
           if (payload.zoomUrl) {
             inner += `    <div class="button-container">`;
             inner += `      <a href="${payload.zoomUrl}" target="_blank" class="zoom-btn">🎥 Starte Zoom-Session</a>`;
-            inner += `      <button class="copy-icon" onclick="copyToClipboard('${payload.zoomUrl}')">📋</button>`;
+            inner += `      <button class="copy-icon" title="Zoom-Link in die Zwischenablage kopieren" onclick="copyToClipboard('${payload.zoomUrl}')">📋</button>`;
             inner += `    </div>`;
           }
 
@@ -475,7 +475,10 @@
               inner += `    <strong>HZ1 – ${
                 match.isTeamA ? "Erste" : "Zweite"
               } Passworthälfte:</strong>`;
-              inner += `    <div class="password-half">${match.passwordHalves.HZ1}</div>`;
+              inner += `    <div style="display: flex; gap: 8px; align-items: center;">`;
+              inner += `      <div class="password-half">${match.passwordHalves.HZ1}</div>`;
+              inner += `      <button class="copy-icon" title="Passwort in die Zwischenablage kopieren" onclick="copyToClipboard('${match.passwordHalves.HZ1}')">📋</button>`;
+              inner += `    </div>`;
               inner += `  </div>`;
             }
 
@@ -484,7 +487,10 @@
               inner += `    <strong>HZ2 – ${
                 match.isTeamA ? "Erste" : "Zweite"
               } Passworthälfte:</strong>`;
-              inner += `    <div class="password-half">${match.passwordHalves.HZ2}</div>`;
+              inner += `    <div style="display: flex; gap: 8px; align-items: center;">`;
+              inner += `      <div class="password-half">${match.passwordHalves.HZ2}</div>`;
+              inner += `      <button class="copy-icon" title="Passwort in die Zwischenablage kopieren" onclick="copyToClipboard('${match.passwordHalves.HZ2}')">📋</button>`;
+              inner += `    </div>`;
               inner += `  </div>`;
             }
 
@@ -502,18 +508,6 @@
         matchContainer.innerHTML = inner;
       }
 
-      function copyToClipboard(text) {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => {
-            alert("Zoom-Link in die Zwischenablage kopiert!");
-          })
-          .catch((err) => {
-            console.error("Fehler beim Kopieren:", err);
-            alert("Fehler beim Kopieren des Links.");
-          });
-      }
-
       function formatDateTime(date) {
         return (
           date.toLocaleString("de-DE", {
@@ -524,18 +518,6 @@
             minute: "2-digit",
           }) + " Uhr"
         );
-      }
-
-      function copyToClipboard(text) {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => {
-            alert("Zoom-Link in die Zwischenablage kopiert!");
-          })
-          .catch((err) => {
-            console.error("Fehler beim Kopieren:", err);
-            alert("Fehler beim Kopieren des Links.");
-          });
       }
     </script>
   </body>
