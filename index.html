@@ -154,9 +154,41 @@
         text-decoration: none;
         border-radius: 4px;
         font-weight: bold;
+        margin-right: 8px;
       }
       .download-btn:hover {
         background: #a00000;
+      }
+      .zoom-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #0066cc;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        margin-right: 8px;
+      }
+      .zoom-btn:hover {
+        background: #0052a3;
+      }
+      .copy-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .copy-icon:hover {
+        background: rgba(255, 255, 255, 0.3);
       }
       .live-badge {
         background: #dc3545;
@@ -325,6 +357,18 @@
         fetchPortalDataJSONP(loginId);
       }
 
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert("Zoom-Link in die Zwischenablage kopiert!");
+          })
+          .catch((err) => {
+            console.error("Fehler beim Kopieren:", err);
+            alert("Fehler beim Kopieren des Links.");
+          });
+      }
+
       // JSONP call to GAS Web App
       function fetchPortalDataJSONP(loginId) {
         const callbackName = "handlePortalData";
@@ -392,6 +436,12 @@
           inner += `      ${formatDateTime(start)}`;
           inner += `    </div>`;
 
+          if (payload.zoomUrl) {
+            inner += `    <div class="button-container">`;
+            inner += `      <a href="${payload.zoomUrl}" target="_blank" class="zoom-btn">🎥 Starte Zoom-Session<span class="copy-icon" onclick="copyToClipboard('${payload.zoomUrl}'); event.preventDefault();">📋</span></a>`;
+            inner += `    </div>`;
+          }
+
           if (match.isAccessible || match.isLive) {
             inner += `    <div class="button-container">`;
             inner += `      <a href="${payload.categoryFolderUrl}" class="download-btn">📁 Zum Download der Kategorien</a>`;
@@ -449,6 +499,18 @@
         matchContainer.innerHTML = inner;
       }
 
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert("Zoom-Link in die Zwischenablage kopiert!");
+          })
+          .catch((err) => {
+            console.error("Fehler beim Kopieren:", err);
+            alert("Fehler beim Kopieren des Links.");
+          });
+      }
+
       function formatDateTime(date) {
         return (
           date.toLocaleString("de-DE", {
@@ -459,6 +521,18 @@
             minute: "2-digit",
           }) + " Uhr"
         );
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert("Zoom-Link in die Zwischenablage kopiert!");
+          })
+          .catch((err) => {
+            console.error("Fehler beim Kopieren:", err);
+            alert("Fehler beim Kopieren des Links.");
+          });
       }
     </script>
   </body>
