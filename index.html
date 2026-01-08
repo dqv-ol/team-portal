@@ -163,7 +163,7 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #0066cc;
+        background: #5b9fe8;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
@@ -174,21 +174,23 @@
         margin-right: 8px;
       }
       .zoom-btn:hover {
-        background: #0052a3;
+        background: #3a8fd8;
       }
       .copy-icon {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 3px;
+        width: 40px;
+        height: 40px;
+        background: #5b9fe8;
+        border: none;
+        border-radius: 4px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 18px;
+        margin-left: 8px;
       }
       .copy-icon:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: #3a8fd8;
       }
       .live-badge {
         background: #dc3545;
@@ -438,7 +440,8 @@
 
           if (payload.zoomUrl) {
             inner += `    <div class="button-container">`;
-            inner += `      <a href="${payload.zoomUrl}" target="_blank" class="zoom-btn">🎥 Starte Zoom-Session<span class="copy-icon" onclick="copyToClipboard('${payload.zoomUrl}'); event.preventDefault();">📋</span></a>`;
+            inner += `      <a href="${payload.zoomUrl}" target="_blank" class="zoom-btn">🎥 Starte Zoom-Session</a>`;
+            inner += `      <button class="copy-icon" onclick="copyToClipboard('${payload.zoomUrl}')">📋</button>`;
             inner += `    </div>`;
           }
 
