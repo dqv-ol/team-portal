@@ -82,6 +82,9 @@ Schlüssel                   | Wert
 ----------------------------|---------------------------
 CATEGORY_FOLDER_URL         | https://drive.google.com/...
 QUESTIONS_FOLDER_URL        | https://drive.google.com/...
+INQUIRY_FORM_URL            | https://forms.gle/...
+ZOOM_URL                    | https://us06web.zoom.us/j/82031292262?pwd=...
+FOLDER_URL_ONEDRIVE         | https://onedrive.com/... (wird noch nicht verwendet)
 ACCESS_MINUTES_BEFORE       | 30
 MATCH_ACTIVE_HOURS          | 4
 PASSWORT_HAELFTE_A_HZ1      | Passwort Team A (Halbzeit 1)
@@ -93,10 +96,13 @@ SPIELTAG_DATUM              | 15.01.2026
 
 **Hinweise:**
 
-- `CATEGORY_FOLDER_URL` - Link zum Google Drive Ordner mit den Kategorien (für alle Teams)
+- `CATEGORY_FOLDER_URL` - Link zum Google Drive Ordner mit den Kategorien
 - `QUESTIONS_FOLDER_URL` - Link zum Google Drive Ordner mit den Fragen (nur für Captains)
+- `INQUIRY_FORM_URL` - Link zum Klärungsformular (nur für Captains)
+- `ZOOM_URL` - Link für die Zoom-Session für alle Teams
+- `FOLDER_URL_ONEDRIVE` - funktioniert noch nicht
 - `PASSWORT_HAELFTE_*_HZ1/HZ2` - Separate Passworthälften für Halbzeit 1 und 2
-- `SPIELTAG_DATUM` (Format: DD.MM.YYYY) - Erforderlich, wenn im Tab "Zeiten" nur Uhrzeiten stehen
+- `SPIELTAG_DATUM` (Format: DD.MM.YYYY) - Erforderlich, da im Tab "Matches" nur Uhrzeiten stehen
 
 #### Tab: Teams
 
@@ -109,7 +115,7 @@ ABC    | Awesome Quiz Team     | T12345678X     | C87654321Y
 
 **Wichtig:** IDs müssen mindestens 8 Zeichen lang und eindeutig sein!
 
-#### Tab: Zeiten
+#### Tab: Matches
 
 ```
 Gruppe | Kürzel A | Kürzel B | Team A        | Team B        | Startzeit
@@ -117,13 +123,6 @@ Gruppe | Kürzel A | Kürzel B | Team A        | Team B        | Startzeit
 A      | ABC      | XYZ      | Team Alpha    | Team Beta     | 19:00
 B      | GEP      | DQB      | Gemischtes... | Die Quiz...   | 20:30
 ```
-
-**Hinweis zu zwei Halbzeiten:**
-
-- Eine Zeile pro Match mit einer Startzeit
-- Das System erzeugt automatisch zwei Halbzeiten (HZ1 und HZ2) intern
-- Beide Halbzeiten haben die gleiche Startzeit, aber unterschiedliche Passwörter
-- Bei nur Uhrzeit (z.B. `19:00`) wird automatisch `SPIELTAG_DATUM` aus der Konfiguration ergänzt
 
 ### 2. Google Apps Script erstellen
 
