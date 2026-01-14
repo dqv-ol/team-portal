@@ -1,0 +1,14 @@
+{
+  "CATEGORY_FOLDER_URL": "https://drive.google.com/drive/folders/...",
+  "QUESTIONS_FOLDER_URL": "https://drive.google.com/drive/folders/...",
+  "ZOOM_URL": "https://us06web.zoom.us/j/82031292262?pwd=...",
+  "INQUIRY_FORM_URL": "https://forms.gle/...",
+  "FOLDER_URL_ONEDRIVE": "https://onedrive.com/...",
+  "ACCESS_MINUTES_BEFORE": "30",
+  "MATCH_ACTIVE_HOURS": "4",
+  "SPIELTAG_DATUM": "14.01.2026",
+  "PASSWORT_HAELFTE_A_HZ1": "2Zwei",
+  "PASSWORT_HAELFTE_A_HZ2": "4Vier",
+  "PASSWORT_HAELFTE_B_HZ1": "1Eins",
+  "PASSWORT_HAELFTE_B_HZ2": "3Drei"
+}

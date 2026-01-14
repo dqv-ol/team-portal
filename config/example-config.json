@@ -1,0 +1,125 @@
+{
+  "description": "Beispiel-Konfiguration für das DQV Team Portal",
+  "googleSheetStructure": {
+    "Konfiguration": {
+      "beschreibung": "Zentrale Konfiguration für alle Settings",
+      "beispielDaten": {
+        "ZOOM_URL": "https://us06web.zoom.us/j/82031292262?pwd=YOUR_PASSWORD",
+        "INQUIRY_FORM_URL": "https://forms.gle/dVbActx3BDBPzmEZA",
+        "CATEGORY_FOLDER_URL": "https://drive.google.com/drive/folders/1Ee6tNNeLjtAU_jhNN75pMrlGhuBNzHEe",
+        "QUESTIONS_FOLDER_URL": "https://drive.google.com/drive/folders/1RowaVbFU9-7IV66LgJ4PlAolkhAB2J-r",
+        "FOLDER_URL_ONEDRIVE": "https://onedrive.com/...",
+        "ONEDRIVE_EXCEL_URL": "https://onedrive.com/.../file.xlsx?download=1",
+        "ACCESS_MINUTES_BEFORE": "30",
+        "MATCH_ACTIVE_HOURS": "4",
+        "SPIELTAG_DATUM": "14.01.2026",
+        "PASSWORT_HAELFTE_A_HZ1": "2Zwei",
+        "PASSWORT_HAELFTE_A_HZ2": "4Vier",
+        "PASSWORT_HAELFTE_B_HZ1": "1Eins",
+        "PASSWORT_HAELFTE_B_HZ2": "3Drei"
+      }
+    },
+    "Teams": {
+      "beschreibung": "Liste aller Teams mit Login-Informationen",
+      "spalten": [
+        "Teamname",
+        "Kürzel",
+        "Team-ID",
+        "Captain-ID"
+      ],
+      "beispielDaten": [
+        {
+          "Teamname": "Gemischtes Pack",
+          "Kürzel": "GEP",
+          "Team-ID": "GEP12345678",
+          "Captain-ID": "GEP_CAPTAIN"
+        },
+        {
+          "Teamname": "Die Quizbegierigen",
+          "Kürzel": "DQB",
+          "Team-ID": "DQB98765432",
+          "Captain-ID": "DQB_CAPTAIN"
+        }
+      ],
+      "hinweise": [
+        "Team-ID und Captain-ID müssen mindestens 8 Zeichen lang sein",
+        "Der Teamname wird im Portal angezeigt",
+        "Das Kürzel wird für Match-Zuordnung verwendet"
+      ]
+    },
+    "Matches": {
+      "beschreibung": "Spieldaten mit Zeiten und Links",
+      "spalten": [
+        "Gruppe",
+        "Kürzel A",
+        "Kürzel B",
+        "Team A",
+        "Team B",
+        "Startzeit",
+        "Zähl-Link"
+      ],
+      "beispielDaten": [
+        {
+          "Gruppe": "B",
+          "Kürzel A": "DQB",
+          "Kürzel B": "GEP",
+          "Team A": "Die Quizbegierigen",
+          "Team B": "Gemischtes Pack",
+          "Startzeit": "2026-01-08T08:00:00",
+          "Zähl-Link": "https://results.quiznations.com/match/rNo7ofJRkQ14"
+        }
+      ],
+      "hinweise": [
+        "Startzeit kann sein: HH:MM (wenn SPIELTAG_DATUM gesetzt) oder DD.MM.YYYY HH:MM",
+        "Zähl-Link ist optional",
+        "Team A und Team B müssen mit Teamname aus Teams-Sheet übereinstimmen"
+      ]
+    }
+  },
+  "einstellungen": {
+    "ACCESS_MINUTES_BEFORE": {
+      "default": 30,
+      "beschreibung": "Wie viele Minuten vor Match-Start können Kategorien heruntergeladen werden?"
+    },
+    "MATCH_ACTIVE_HOURS": {
+      "default": 4,
+      "beschreibung": "Wie lange nach Match-Start bleiben Links verfügbar?"
+    },
+    "SPIELTAG_DATUM": {
+      "format": "DD.MM.YYYY",
+      "beschreibung": "Spieltag-Datum, falls Startzeiten nur HH:MM enthalten"
+    }
+  },
+  "urls": {
+    "ZOOM_URL": {
+      "typ": "externe URL",
+      "beschreibung": "Zoom-Meeting-Link für alle Teams"
+    },
+    "INQUIRY_FORM_URL": {
+      "typ": "Google Form",
+      "beschreibung": "Formular für Rückfragen (nur für Captains während LIVE)"
+    },
+    "CATEGORY_FOLDER_URL": {
+      "typ": "Google Drive Ordner",
+      "beschreibung": "Kategorien Download (sichtbar während Access Window)"
+    },
+    "QUESTIONS_FOLDER_URL": {
+      "typ": "Google Drive Ordner",
+      "beschreibung": "Fragen Download (nur für Captains während LIVE)"
+    },
+    "FOLDER_URL_ONEDRIVE": {
+      "typ": "OneDrive Ordner",
+      "beschreibung": "Fallback zu CATEGORY_FOLDER_URL"
+    }
+  },
+  "passwortHaelften": {
+    "beschreibung": "Geteilte Passwörter für Captain-Info",
+    "struktur": {
+      "PASSWORT_HAELFTE_A_HZ1": "Erste Hälfte für Team A, Halbzeit 1",
+      "PASSWORT_HAELFTE_A_HZ2": "Erste Hälfte für Team A, Halbzeit 2",
+      "PASSWORT_HAELFTE_B_HZ1": "Erste Hälfte für Team B, Halbzeit 1",
+      "PASSWORT_HAELFTE_B_HZ2": "Erste Hälfte für Team B, Halbzeit 2"
+    },
+    "sichtbar": "Nur wenn User Captain ist und Match ist LIVE"
+  }
+}
